@@ -1,0 +1,77 @@
+-- Find the albums recorded by the artist Queen.
+>>> Artist.objects.filter(name='Queen')
+<QuerySet [<Artist: Artist object (51)>]>
+>>> Album.objects.filter(artist=51)
+<QuerySet [<Album: Album object (32)>, <Album: Album object (181)>, <Album: Album object (182)>]>
+
+>>> Album.objects.filter(artist=(Artist.objects.get(name='Queen')))
+<QuerySet [<Album: Album object (32)>, <Album: Album object (181)>, <Album: Album object (182)>]>
+
+>>> Artist.objects.get(name='Queen').album_set.all()
+<QuerySet [<Album: Album object (32)>, <Album: Album object (181)>, <Album: Album object (182)>]>
+
+>>> Album.objects.filter(artist=(Artist.objects.get(name='Queen')))[0].title
+'Greatest Hits II'
+>>> Album.objects.filter(artist=(Artist.objects.get(name='Queen')))[1].title
+'Greatest Hits I'
+>>> Album.objects.filter(artist=(Artist.objects.get(name='Queen')))[2].title
+'News Of The World'
+
+-- Count how many tracks belong to the media type "Protected MPEG-4 video file".
+
+>>> MediaType.objects.filter(name='Protected MPEG-4 video file')
+<QuerySet [<MediaType: MediaType object (3)>]>
+>>> Track.objects.filter(media_type_id=3).count()
+214
+
+>>> MediaType.objects.get(name='Protected MPEG-4 video file').track_set.count()
+214
+
+-- Find the genre with the name "Hip Hop/Rap".
+
+>>> Genre.objects.get(name='Hip Hop/Rap')
+<Genre: Genre object (17)>
+
+-- Count how many tracks belong to the "Hip Hop/Rap" genre
+
+>>> Genre.objects.get(name='Hip Hop/Rap').track_set.count()
+35
+
+-- Find the total amount of time required to listen to all the tracks in the database.
+
+>>> from django.db.models import Avg, Sum, Max, Min
+>>> Track.objects.aggregate(Sum('milliseconds'))
+{'milliseconds__sum': 1377942652}
+
+-- Find the highest price of any track that has the media type "MPEG audio file".
+
+
+>>> MediaType.objects.get(name='MPEG audio file').track_set.order_by('-unit_price')[0].unit_price
+Decimal('0.99')
+
+-- Find the name of the most expensive track that has the media type "MPEG audio file".
+
+>>> MediaType.objects.get(name='MPEG audio file').track_set.order_by('-unit_price')[0].name
+'Put The Finger On You'
+
+-- Find the 2 oldest artists.
+
+>>> Artist.objects.order_by('created_at')[0].name
+'Les Arts Florissants & William Christie'
+>>> Artist.objects.order_by('created_at')[1].name
+'Baby Consuelo'
+
+-- Find the least expensive track that has the genre "Electronica/Dance".
+
+>>> Genre.objects.get(name='Electronica/Dance').track_set.order_by('unit_price')[0].name
+'Instinto Colectivo'
+
+-- Find all "MPEG audio file" tracks in the genre "Electronica/Dance".
+
+MediaType.objects.filter(name='MPEG audio file')
+Genre.objects.get(name='Electronica/Dance').track_set
+
+>>> Genre.objects.get(name='Electronica/Dance').track_set.filter(media_type_id=1)
+<QuerySet [<Track: Track object (3319)>, <Track: Track object (3320)>, <Track: Track object (3321)>, <Track: Track object (3322)>, <Track: Track object (3323)>, <Track: Track object (3324)>, <Track: Track object (3325)>, <Track: Track object (3327)>, <Track: Track object (3328)>, <Track: Track object (3329)>, <Track: Track object (3330)>, <Track: Track object (3331)>, <Track: Track object (3333)>, <Track: Track object (3334)>, <Track: Track object (3335)>, <Track: Track object (1456)>, <Track: Track object (1463)>, <Track: Track object (1455)>, <Track: Track object (3326)>, <Track: Track object (3332)>, '...(remaining elements truncated)...']>
+>>> Genre.objects.get(name='Electronica/Dance').track_set.filter(media_type_id=1).count()
+28
